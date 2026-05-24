@@ -6,7 +6,7 @@ const StatusModal = ({ visible, onRetry, onLater }) => {
         <Modal visible={visible} transparent animationType="fade">
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
-                    <Text style={style.modalText}>
+                    <Text style={styles.modalText}>
                         Não foi possível conectar ao Broker HiveMQ.
                         Verifique sua conexão e credenciais
                     </Text>
@@ -27,7 +27,7 @@ const StatusModal = ({ visible, onRetry, onLater }) => {
 const styles = StyleSheet.create({
     modalContainer: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.85',
+        backgroundColor: 'rgba(0,0,0,0.85)',
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
 
-    btnlater: {
+    btnLater: {
         backgroundColor: '#444',
         padding: 15,
         borderRadius: 12,

@@ -26,11 +26,11 @@ export default class MQTTService {
         const options = {
             userName: user,
             password: pass,
-            userSSL: true,
+            useSSL: true,
             onSuccess: onConnect,
             onFailure: onFailure,
             timeout: 3,
-            keepAliveInternal: 60,
+            keepAliveInterval: 60,
         };
 
         this.client.connect(options);

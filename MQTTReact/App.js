@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { env } from '@expo/env';
+import { env } from 'react-native-dotenv'
 import MQTTService from './src/services/mqttServices.js';
 import StatusModal from './src/components/StatusModal.js';
 import LightControl from './src/components/LightControl.js';
@@ -16,11 +16,11 @@ export default function App() {
   const [hum, setHum] = useState(0);
 
   const mqttConfig = {  
-    host: env.MQTT_HOST,
-    port: parseInt(env.MQTT_PORT),
-    path: env.MQTT_PATH,
-    user: env.MQTT_USER,
-    pass: env.MQTT_PASS,
+    host: process.env.EXPO_PUBLIC_MQTT_HOST,
+    port: parseInt(process.env.EXPO_PUBLIC_MQTT_PORT),
+    path: "/mqtt",
+    user: process.env.EXPO_PUBLIC_MQTT_USER,
+    pass: process.env.EXPO_PUBLIC_MQTT_PASS,
     clientId: 'RN_App_' + Math.random()
   };
 

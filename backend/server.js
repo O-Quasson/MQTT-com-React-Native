@@ -19,7 +19,11 @@ app.use(cors());
 
 app.get('/get', async (req, res) => {
 
-    const dados = await dice.findAll();
+    const dados = await dice.findAll({
+        order: [
+            ['createdAt', 'DESC']
+        ]
+    });
 
     if((dados)&&(dados.length>0)){
         res.send(dados);
@@ -49,7 +53,7 @@ app.post('/salva', async (req, res) => {
         umidade: req.body.umidade
     }
 
-    const salvo = dice.create({
+    const salvo = await dice.create({
         luz: truta.luz,
         temperatura: truta.temperatura,
         umidade: truta.umidade

@@ -24,7 +24,7 @@ export default (sequelize) => {
             allowNull: true
         }
     }, {
-        tableName: 'Usuario',
+        tableName: 'Dados',
         timestamps: true
     });
 

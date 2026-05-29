@@ -7,6 +7,7 @@ import LightControl from './src/components/LightControl.js';
 import Gauges from './src/components/Gauges.js';
 
 import api from './src/axios/api.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const mqtt = new MQTTService();
 
@@ -18,6 +19,9 @@ export default function App() {
   const [hum, setHum] = useState(0);
 
   const [dados, setdados] = useState();
+  const [refluz, setrefluz] = useState(false);
+  const [reftemp, setreftemp] = useState(0);
+  const [refhum, setrefhum] = useState(0);
 
   const mqttConfig = {  
     host: process.env.EXPO_PUBLIC_MQTT_HOST,
@@ -35,10 +39,18 @@ export default function App() {
       umidade: hum
     }
 
-    api.post('/salva', coiso)
-      .then((data) => {
-        console.log(data.data);
-      })
+    if((coiso.temperatura!=reftemp)||(coiso.umidade!=refhum)||(coiso.luz!=refluz)){
+      api.post('/salva', coiso)
+        .then((data) => {
+          console.log(data.data);
+        })
+
+      setrefluz(coiso.luz);
+      setreftemp(coiso.temperatura);
+      setrefhum(coiso.umidade);
+
+      await AsyncStorage.setItem('dadosAnt', JSON.stringify(coiso));
+    }
 
     let uhhhh = await api.get('/get');
     setdados(uhhhh.data);
@@ -48,12 +60,29 @@ export default function App() {
     startConnection();
 
     api.get('/get')
-      .then((resposta) => {setdados(resposta.data)})
+      .then(async (resposta) => {
+        setdados(resposta.data);
+
+        let tuca = await AsyncStorage.getItem('dadosAnt');
+
+        if(tuca){
+          let donka = JSON.parse(tuca);
+
+          setrefluz(donka.luz);
+          setreftemp(donka.temperatura);
+          setrefhum(donka.umidade);
+
+          setIsLightOn(donka.luz);
+          setTemp(donka.temperatura);
+          setHum(donka.umidade);
+        };
+
+      })
       .catch((erro) => {console.log('dumbass error: ' + erro)})
 
     envia();
 
-  }, [isLightOn, hum, temp]);
+  }, [isLightOn, temp, hum]);
 
   const startConnection = () => {
     setShowError(false);
@@ -84,7 +113,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={[{width: '30%'}]}>
         <Text style={styles.header}>Smart Home IoT</Text>
 
         <LightControl isLightOn={isLightOn} onToggle={toggleLight} />
@@ -93,14 +122,15 @@ export default function App() {
 
         <StatusModal visible={showError} onRetry={startConnection} onLater={() => setShowError(false)} />
       </View>
-      <View>
+
+      <View style={[{width: '30%'}]}>
         <FlatList 
           data={dados} 
           keyExtractor={item => item.id}
           renderItem={({item}) => (
-            <View style={[{flexDirection: 'column', backgroundColor: 'rgb(151, 185, 219)'}]}>
+            <View style={[{flexDirection: 'column', backgroundColor: 'rgb(151, 185, 219)', marginBottom: 2}]}>
               <Text>
-                Luz: {item.luz ? 'ligado' : 'desligado'}
+                Luz: {item.luz ? 'Ligado' : 'Desligado'}
               </Text>
 
               <Text>
@@ -110,9 +140,13 @@ export default function App() {
               <Text>
                 Umidade: {item.umidade}%
               </Text>
+
+              <Text>
+                Horário: {new Date(item.createdAt).toLocaleString('pt-BR')}
+              </Text>
             </View>
           )}
-          style={[{backgroundColor: 'rgb(44, 55, 66)'}]}
+          style={[{backgroundColor: 'rgb(44, 55, 66)', height: window.innerHeight*0.7}]}
         />
       </View>
     </View>
@@ -125,7 +159,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     alignItems: 'center',
     padding: 20,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: '2%'
   },
 
   header: {
